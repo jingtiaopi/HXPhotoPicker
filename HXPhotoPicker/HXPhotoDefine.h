@@ -140,6 +140,14 @@ static inline NSString * _Nonnull HXDiskCacheFileNameForKey(NSString * _Nullable
     CC_MD5(str, (CC_LONG)strlen(str), r);
     NSURL *keyURL = [NSURL URLWithString:key];
     NSString *ext = keyURL ? keyURL.pathExtension : key.pathExtension;
+    // FIXME: fixed 到岗到位 bug. The url is not normal for video, there is no suffix string for the type of video.
+    if (!ext || ext.length == 0) {
+        NSString *pathExtension = key.pathExtension;
+        if (pathExtension) {
+            NSRange range = [pathExtension rangeOfString:@"&"];
+            ext = [pathExtension substringToIndex:range.location];
+        }
+    }
     // File system has file name length limit, we need to check if ext is too long, we don't add it to the filename
     if (ext.length > HX_MAX_FILE_EXTENSION_LENGTH) {
         ext = nil;
